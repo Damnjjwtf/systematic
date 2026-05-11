@@ -1,14 +1,16 @@
-# PRD: The Systematic Brief
+# PRD: Systematic - The Living Brief for Systematic Traders
 
 ## Product Summary
-The Systematic Brief is a daily intelligence brief for systematic futures traders.
+Systematic - The Living Brief for Systematic Traders is a daily intelligence brief for systematic futures traders.
 
 It tracks market regimes, trend-following performance, systematic research, CTA behavior, futures market structure, regulation, and trader psychology. The brief turns daily signals into disciplined context: what changed, what matters, what is noise, what may break systems, and what a rules-based trader should do next.
 
 The brief is built from the same operating DNA as The f.m Brief: source-grounded findings, visible uncertainty, persona-assisted synthesis, archive memory, and one concrete recommended move per day.
 
+It is also the first expression of the Living Briefs product thesis: a source-grounded intelligence object that can eventually be queried, challenged, updated, remembered, and turned into action.
+
 ## Purpose
-The Systematic Brief exists to help systematic traders stay informed without becoming discretionary.
+Systematic exists to help systematic traders stay informed without becoming discretionary.
 
 It should answer:
 
@@ -67,7 +69,7 @@ HTML
 Public/internal product name:
 
 ```text
-The Systematic Brief
+Systematic - The Living Brief for Systematic Traders
 ```
 
 Underlying intelligence layer:
@@ -119,7 +121,7 @@ Paper quality, methodology, backtest hygiene, out-of-sample skepticism, implemen
 Each email should include:
 
 ```text
-THE SYSTEMATIC BRIEF
+SYSTEMATIC - THE LIVING BRIEF FOR SYSTEMATIC TRADERS
 Date
 
 Lead Signal
@@ -233,7 +235,7 @@ A top-level strategic analysis with:
 {
   "near_term_arbitrage": "what is underpriced or misunderstood in the next 30-90 days",
   "future_signal": "where this cluster of signals may be headed",
-  "moat_strategy": "how The Systematic Brief can convert this into durable audience, trust, data, or distribution advantage",
+  "moat_strategy": "how Systematic can convert this into durable audience, trust, data, or distribution advantage",
   "do_not_do": "one tempting but dangerous move to avoid"
 }
 ```
@@ -364,7 +366,7 @@ Every finding should include:
   "arbitrage_moat": {
     "future_vector": "where this specific signal may go next",
     "arbitrage": "what is underpriced or misunderstood",
-    "moat_move": "how The Systematic Brief can build advantage"
+    "moat_move": "how Systematic can build advantage"
   },
   "verification_status": "VERIFIED / PARTIAL / WATCHLIST",
   "confidence": "HIGH / MEDIUM / LOW",
@@ -388,7 +390,7 @@ Future Vector is not the same as Systematic Takes.
 - Systematic Takes: persona-led thesis across signals.
 
 ## Source Strategy
-The Systematic Brief should use a tiered source model.
+Systematic should use a tiered source model.
 
 ## Tier 1: Primary / High Trust
 Used for hard claims.
@@ -616,7 +618,7 @@ Config:
 ```bash
 SYSTEMATIC_BRIEF_PROVIDER=gemini
 SYSTEMATIC_BRIEF_MODEL=gemini-2.5-flash
-SYSTEMATIC_BRIEF_FROM_NAME=The Systematic Brief
+SYSTEMATIC_BRIEF_FROM_NAME=Systematic - The Living Brief for Systematic Traders
 SYSTEMATIC_BRIEF_DRY_RUN=0
 SYSTEMATIC_RESOLVE_GROUNDING_URLS=1
 SYSTEMATIC_TEST_LIST=
@@ -625,7 +627,7 @@ SYSTEMATIC_TEST_LIST=
 ## Config Example
 ```json
 {
-  "brief_name": "The Systematic Brief",
+  "brief_name": "Systematic - The Living Brief for Systematic Traders",
   "slug": "systematic",
   "recipient": "subscribers@thesystematicbrief.com",
   "schedule": {
@@ -681,7 +683,7 @@ The v1 system should use four prompt layers.
 
 ## 1. System Prompt
 ```text
-You are SYSTEMATIC, the intelligence layer for The Systematic Brief.
+You are SYSTEMATIC, the intelligence layer for Systematic - The Living Brief for Systematic Traders.
 
 Your job is to produce a daily, source-grounded intelligence brief for systematic futures traders. Be clinical, direct, skeptical, and process-first. Do not hype. Do not provide personalized financial advice. Do not recommend discretionary overrides unless the recommended action is to follow a prewritten rule.
 
@@ -699,7 +701,7 @@ Prioritize primary sources and trusted analysis. Use community/practitioner sour
 
 ## 3. Synthesis Prompt
 ```text
-Synthesize the findings into The Systematic Brief.
+Synthesize the findings into Systematic - The Living Brief for Systematic Traders.
 
 Use the required section order. Keep the brief readable in under 3 minutes. Include 2-4 Systematic Takes. Use personas only when their lens adds value. Include one Recommended Move. If there is no action, say Hold course.
 
@@ -718,7 +720,7 @@ The model should return JSON with:
 
 ```json
 {
-  "brief_name": "The Systematic Brief",
+  "brief_name": "Systematic - The Living Brief for Systematic Traders",
   "date": "YYYY-MM-DD",
   "observed_at": "YYYY-MM-DD HH:MM timezone",
   "lead_signal": "",
@@ -829,7 +831,7 @@ Archive loaded before each run to prevent:
 ## G-Stack Build Operating Model
 Garry Tan's G-Stack is used as the build workflow, not as brief content.
 
-The Systematic Brief should be built with this loop:
+Systematic should be built with this loop:
 
 ```text
 Think -> Plan -> Build -> Review -> Test -> Ship -> Retro
@@ -916,4 +918,4 @@ Do not remove the discipline layer.
 - "what changed in our thesis?" weekly report
 
 ## One-Line Definition
-The Systematic Brief is a daily, source-grounded intelligence system that helps systematic futures traders turn regime shifts, research, CTA performance, and market-structure signals into discipline, context, and durable edge.
+Systematic - The Living Brief for Systematic Traders is a daily, source-grounded intelligence system that helps systematic futures traders turn regime shifts, research, CTA performance, and market-structure signals into discipline, context, and durable edge.

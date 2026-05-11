@@ -1,4 +1,4 @@
-# The Systematic Brief
+# Systematic - The Living Brief for Systematic Traders
 
 A daily, source-grounded intelligence brief for systematic futures traders.
 
@@ -9,6 +9,7 @@ The brief tracks market regimes, CTA performance, systematic research, futures m
 ## Current V1 Artifacts
 
 - `systematic_brief_prd.md` - executable product and build spec
+- `docs/living_briefs_north_star.md` - category and product north star
 - `config/systematic.json` - operating config
 - `prompts/systematic_brief_prompts.md` - prompt architecture
 - `schemas/systematic_brief.schema.json` - structured output contract

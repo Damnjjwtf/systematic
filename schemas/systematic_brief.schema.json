@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "The Systematic Brief Output",
+  "title": "Systematic - The Living Brief for Systematic Traders Output",
   "type": "object",
   "required": [
     "brief_name",
@@ -22,7 +22,7 @@
   ],
   "properties": {
     "brief_name": {
-      "const": "The Systematic Brief"
+      "const": "Systematic - The Living Brief for Systematic Traders"
     },
     "date": {
       "type": "string"
