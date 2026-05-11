@@ -1,0 +1,298 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "The Systematic Brief Output",
+  "type": "object",
+  "required": [
+    "brief_name",
+    "date",
+    "observed_at",
+    "lead_signal",
+    "source_integrity",
+    "sections",
+    "arbitrage_moat",
+    "systematic_takes",
+    "discipline_check",
+    "hallucination_guardrails",
+    "systematic_synthesis",
+    "recommended_move",
+    "watchlist",
+    "strategic_prompt",
+    "next_search",
+    "findings"
+  ],
+  "properties": {
+    "brief_name": {
+      "const": "The Systematic Brief"
+    },
+    "date": {
+      "type": "string"
+    },
+    "observed_at": {
+      "type": "string"
+    },
+    "lead_signal": {
+      "type": "string"
+    },
+    "source_integrity": {
+      "type": "string"
+    },
+    "sections": {
+      "type": "object",
+      "required": [
+        "regime_watch",
+        "strategy_performance_signals",
+        "research_edge",
+        "regulatory_structure",
+        "cta_competitor_watch"
+      ],
+      "properties": {
+        "regime_watch": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "strategy_performance_signals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "research_edge": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "regulatory_structure": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "cta_competitor_watch": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        }
+      }
+    },
+    "arbitrage_moat": {
+      "type": "object",
+      "required": [
+        "near_term_arbitrage",
+        "future_signal",
+        "moat_strategy",
+        "do_not_do"
+      ],
+      "properties": {
+        "near_term_arbitrage": {
+          "type": "string"
+        },
+        "future_signal": {
+          "type": "string"
+        },
+        "moat_strategy": {
+          "type": "string"
+        },
+        "do_not_do": {
+          "type": "string"
+        }
+      }
+    },
+    "systematic_takes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "voices",
+          "take",
+          "why_it_matters",
+          "action"
+        ],
+        "properties": {
+          "voices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "take": {
+            "type": "string"
+          },
+          "why_it_matters": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "discipline_check": {
+      "type": "string"
+    },
+    "hallucination_guardrails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "systematic_synthesis": {
+      "type": "string"
+    },
+    "recommended_move": {
+      "type": "string"
+    },
+    "watchlist": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "item",
+          "why",
+          "trigger"
+        ],
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          },
+          "trigger": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "strategic_prompt": {
+      "type": "string"
+    },
+    "next_search": {
+      "type": "string"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": [
+        "title",
+        "source",
+        "url",
+        "source_date",
+        "observed_at",
+        "newness",
+        "source_tier",
+        "evidence",
+        "summary",
+        "systematic_signal",
+        "arbitrage_moat",
+        "verification_status",
+        "confidence",
+        "caveat",
+        "signal_strength"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "grounding_url": {
+          "type": "string"
+        },
+        "source_date": {
+          "type": "string"
+        },
+        "observed_at": {
+          "type": "string"
+        },
+        "newness": {
+          "enum": [
+            "NEW",
+            "UPDATE",
+            "REPEAT"
+          ]
+        },
+        "source_tier": {
+          "enum": [
+            "TIER_1",
+            "TIER_2",
+            "TIER_3",
+            "TIER_4"
+          ]
+        },
+        "evidence": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "systematic_signal": {
+          "type": "string"
+        },
+        "regime_read": {
+          "type": "string"
+        },
+        "risk": {
+          "type": "string"
+        },
+        "arbitrage_moat": {
+          "type": "object",
+          "required": [
+            "future_vector",
+            "arbitrage",
+            "moat_move"
+          ],
+          "properties": {
+            "future_vector": {
+              "type": "string"
+            },
+            "arbitrage": {
+              "type": "string"
+            },
+            "moat_move": {
+              "type": "string"
+            }
+          }
+        },
+        "verification_status": {
+          "enum": [
+            "VERIFIED",
+            "PARTIAL",
+            "WATCHLIST"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "HIGH",
+            "MEDIUM",
+            "LOW"
+          ]
+        },
+        "caveat": {
+          "type": "string"
+        },
+        "signal_strength": {
+          "enum": [
+            "HIGH",
+            "MEDIUM",
+            "LOW"
+          ]
+        }
+      }
+    }
+  }
+}

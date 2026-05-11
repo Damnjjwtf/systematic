@@ -1,0 +1,144 @@
+{
+  "brief_name": "The Systematic Brief",
+  "slug": "systematic",
+  "recipient_env": "SYSTEMATIC_BRIEF_TO",
+  "default_recipient": "subscribers@thesystematicbrief.com",
+  "schedule": {
+    "cron": "0 11 * * *",
+    "timezone": "America/New_York",
+    "target_local_time": "06:00"
+  },
+  "audiences": {
+    "internal": "JJ as builder/editor/operator",
+    "external": "systematic futures traders, CTAs, quant researchers, managed futures allocators"
+  },
+  "core_thesis": "Rules beat discretion over time. Drawdowns are information. Regime awareness is not permission to override the system.",
+  "voice": "clinical, direct, no hype, process-first",
+  "minimum_findings": 3,
+  "target_new_findings": 2,
+  "max_read_time_minutes": 3,
+  "personas": [
+    {
+      "name": "Covel",
+      "focus": "trend following philosophy, Turtle history, discipline over prediction, staying with convexity"
+    },
+    {
+      "name": "Parker",
+      "focus": "systematic execution, real drawdown psychology, CTA operator perspective, process under pressure"
+    },
+    {
+      "name": "Hite",
+      "focus": "risk management, position sizing, portfolio heat, survival, asymmetric patience"
+    },
+    {
+      "name": "Tharp",
+      "focus": "expectancy, R-multiples, system design, trader psychology, beliefs as hidden system inputs"
+    },
+    {
+      "name": "Market Structure Desk",
+      "focus": "contract specs, liquidity, margin, exchange notices, CFTC/NFA/regulatory mechanics"
+    },
+    {
+      "name": "Research Desk",
+      "focus": "paper quality, methodology, backtest hygiene, out-of-sample skepticism, implementation drag"
+    }
+  ],
+  "sections": [
+    "Lead Signal",
+    "Source Integrity",
+    "Regime Watch",
+    "Strategy Performance Signals",
+    "Research & Edge",
+    "Regulatory / Structure",
+    "CTA / Competitor Watch",
+    "Arbitrage + Moat",
+    "Systematic Takes",
+    "Discipline Check",
+    "Hallucination Guardrails",
+    "Systematic Synthesis",
+    "Recommended Move",
+    "Watchlist",
+    "Today's Strategic Prompt",
+    "Next Search"
+  ],
+  "source_categories": {
+    "tier_1": [
+      "CFTC",
+      "NFA",
+      "CME",
+      "ICE",
+      "Federal Register",
+      "court filings",
+      "official exchange notices",
+      "official company announcements",
+      "academic journals"
+    ],
+    "tier_2": [
+      "Societe Generale CTA commentary",
+      "AQR",
+      "Two Sigma",
+      "Newfound Research",
+      "ReSolve Asset Management",
+      "Man Group research",
+      "Bloomberg",
+      "Reuters",
+      "Financial Times",
+      "law firm regulatory analysis"
+    ],
+    "tier_3": [
+      "r/algotrading",
+      "QuantConnect forums",
+      "Elite Trader",
+      "trader blogs",
+      "X/Twitter systematic trading community",
+      "podcast transcripts",
+      "Substack essays",
+      "GitHub discussions"
+    ],
+    "tier_4": [
+      "small CTA blogs",
+      "new GitHub repos",
+      "conference proceedings",
+      "lecture notes",
+      "niche academic working papers",
+      "backtest blogs",
+      "broker implementation notes",
+      "obscure exchange notices"
+    ]
+  },
+  "standing_queries": [
+    "trend following drawdown 2026",
+    "CTA performance current month",
+    "SocGen CTA trend index latest",
+    "managed futures flows",
+    "futures market structure change",
+    "CFTC position limits futures",
+    "CME margin changes futures",
+    "momentum strategy research",
+    "volatility regime shift",
+    "correlation regime systematic trading",
+    "systematic trading regulation",
+    "managed futures research"
+  ],
+  "discovery_queries": [
+    "new mean reversion research futures",
+    "risk parity research update",
+    "carry strategy futures research",
+    "multi asset momentum paper",
+    "alternative data systematic futures",
+    "transaction costs trend following",
+    "execution slippage CTA futures",
+    "machine learning trend following futures"
+  ],
+  "archive": {
+    "directory": "intelligence/systematic",
+    "filename_template": "YYYY-MM-DD-HHMM-systematic-brief"
+  },
+  "model": {
+    "provider_env": "SYSTEMATIC_BRIEF_PROVIDER",
+    "model_env": "SYSTEMATIC_BRIEF_MODEL",
+    "default_provider": "gemini",
+    "default_model": "gemini-2.5-flash",
+    "fallback_provider": "anthropic"
+  }
+}
