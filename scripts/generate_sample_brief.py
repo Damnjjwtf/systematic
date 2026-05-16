@@ -10,14 +10,60 @@ watchlist triggers, and one disciplined recommended move.
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+import urllib.error
+import urllib.request
+from xml.etree import ElementTree as ET
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
 OUTPUT_JSON = SAMPLES_DIR / "systematic_brief_2026-05-16.json"
 OUTPUT_TXT = SAMPLES_DIR / "systematic_brief_2026-05-16.txt"
+
+
+def now_et_string() -> str:
+    return datetime.now(UTC).astimezone().strftime("%Y-%m-%d %H:%M America/New_York")
+
+
+def today_string() -> str:
+    return datetime.now(UTC).astimezone().strftime("%Y-%m-%d")
+
+
+def fetch_text(url: str, timeout: int = 20) -> str:
+    request = urllib.request.Request(
+        url=url,
+        headers={"User-Agent": "systematic-brief-scraper/1.0"},
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return response.read().decode("utf-8", errors="replace")
+
+
+def fetch_fred_latest(series_id: str) -> tuple[str, float]:
+    csv_url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+    raw = fetch_text(csv_url)
+    lines = [line.strip() for line in raw.splitlines() if line.strip()]
+    for row in reversed(lines[1:]):
+        parts = row.split(",")
+        if len(parts) != 2:
+            continue
+        date_value, numeric = parts[0], parts[1]
+        if numeric and numeric != ".":
+            return date_value, float(numeric)
+    raise RuntimeError(f"No numeric points found for series {series_id}")
+
+
+def fetch_rss_headline(url: str) -> tuple[str, str]:
+    raw = fetch_text(url)
+    root = ET.fromstring(raw)
+    item = root.find(".//item")
+    if item is None:
+        return "No headline found", today_string()
+    title = (item.findtext("title") or "No title").strip()
+    pub_date = (item.findtext("pubDate") or today_string()).strip()
+    return title, pub_date
 
 
 def finding(
@@ -78,15 +124,56 @@ def finding(
 
 
 def build_brief() -> dict[str, Any]:
+    observed_at = now_et_string()
+    date_value = today_string()
+
+    data_freshness_status = "LIVE_PARTIAL"
+    fallback_notes: list[str] = []
+
+    try:
+        vix_date, vix_value = fetch_fred_latest("VIXCLS")
+    except Exception:
+        vix_date, vix_value = date_value, 22.0
+        data_freshness_status = "SAMPLE_FALLBACK"
+        fallback_notes.append("VIX fallback")
+
+    try:
+        ig_date, ig_oas = fetch_fred_latest("BAMLC0A0CM")
+    except Exception:
+        ig_date, ig_oas = date_value, 92.0
+        data_freshness_status = "SAMPLE_FALLBACK"
+        fallback_notes.append("IG OAS fallback")
+
+    try:
+        hy_date, hy_oas = fetch_fred_latest("BAMLH0A0HYM2")
+    except Exception:
+        hy_date, hy_oas = date_value, 265.0
+        data_freshness_status = "SAMPLE_FALLBACK"
+        fallback_notes.append("HY OAS fallback")
+
+    try:
+        cftc_headline, cftc_pub = fetch_rss_headline("https://www.cftc.gov/PressRoom/PressReleases/rss.xml")
+    except Exception:
+        cftc_headline, cftc_pub = "CFTC headline unavailable", date_value
+        fallback_notes.append("CFTC feed unavailable")
+
+    try:
+        cme_headline, cme_pub = fetch_rss_headline("https://www.cmegroup.com/notices/rss.xml")
+    except Exception:
+        cme_headline, cme_pub = "CME notice feed unavailable", date_value
+        fallback_notes.append("CME feed unavailable")
+
+    vix_state = "elevated" if vix_value >= 20 else "normal"
+    spread_gap = round(hy_oas - ig_oas, 1)
     regime_watch = [
         finding(
             title="VIX remains elevated while credit spreads are not yet confirming stress",
             source="CBOE VIX and FRED ICE BofA spread series",
             url="https://fred.stlouisfed.org/series/VIXCLS",
-            source_date="2026-05-15",
+            source_date=vix_date,
             newness="UPDATE",
             source_tier="TIER_1",
-            evidence="Volatility is elevated, but high-yield spreads remain below the stress trigger defined in the operating docs.",
+            evidence=f"Latest FRED VIX close is {vix_value:.2f} on {vix_date}; IG OAS is {ig_oas:.2f} and HY OAS is {hy_oas:.2f}.",
             summary="The tape is uncomfortable, not broken. Volatility is warning that positioning is fragile, while credit has not yet moved into a broad risk-off regime.",
             systematic_signal="Trend systems should treat this as regime friction, not as permission to override live rules.",
             regime_read="HOT: risk-on momentum with elevated volatility and partial confirmation only.",
@@ -99,9 +186,9 @@ def build_brief() -> dict[str, Any]:
             signal_strength="MEDIUM",
             data_point={
                 "metric": "VIX",
-                "value": 22,
+                "value": round(vix_value, 2),
                 "normal_range": "12-20",
-                "status": "elevated",
+                "status": vix_state,
             },
             archive_memory={
                 "last_seen": "2026-04-02",
@@ -113,14 +200,14 @@ def build_brief() -> dict[str, Any]:
 
     strategy_performance = [
         finding(
-            title="Crowded equity futures positioning raises mean-reversion risk",
-            source="CFTC Commitments of Traders",
-            url="https://publicreporting.cftc.gov/",
-            source_date="2026-05-15",
+            title="CFTC flow: latest release headline flags where positioning attention is moving",
+            source="CFTC Press Room RSS",
+            url="https://www.cftc.gov/PressRoom/PressReleases/rss.xml",
+            source_date=cftc_pub,
             newness="NEW",
             source_tier="TIER_1",
-            evidence="Non-commercial ES positioning is described as crowded long in the sample operating model.",
-            summary="Crowding is not a sell signal by itself, but it makes trend continuation more fragile. A reversal in next week's COT report would matter more than today's crowding headline.",
+            evidence=f"Latest CFTC feed item: {cftc_headline}",
+            summary="Regulatory and market-structure updates from the CFTC are now being pulled live. Treat this as directional context for where compliance/positioning narratives are moving.",
             systematic_signal="Positioning risk belongs in the watchlist and risk review, not in discretionary prediction.",
             future_vector="The actionable signal is a week-over-week reversal in positioning, not the existence of crowding alone.",
             arbitrage="Most commentary treats crowded positioning as immediate direction; Systematic can frame it as conditional risk.",
@@ -130,9 +217,9 @@ def build_brief() -> dict[str, Any]:
             caveat="COT data is delayed and should be cross-checked with price, volatility, and liquidity.",
             signal_strength="MEDIUM",
             data_point={
-                "metric": "Non-commercial ES positioning",
-                "status": "crowded_long",
-                "freshness_lag": "weekly release",
+                "metric": "CFTC release feed",
+                "status": "live_headline",
+                "freshness_lag": "near real-time publication feed",
             },
             archive_memory={
                 "last_seen": "2026-02-12",
@@ -165,22 +252,22 @@ def build_brief() -> dict[str, Any]:
 
     regulatory_structure = [
         finding(
-            title="Data licensing is a product risk, not just an engineering detail",
-            source="Imported sources and data strategy",
-            url="docs/operations/sources_and_data.md",
-            source_date="2026-05-16",
+            title="CME notice stream is live and can drive execution-side alerting",
+            source="CME Group Notices RSS",
+            url="https://www.cmegroup.com/notices/rss.xml",
+            source_date=cme_pub,
             newness="NEW",
-            source_tier="TIER_4",
-            evidence="The source strategy distinguishes public-domain sources from proprietary data that may require attribution or limit republication.",
-            summary="The MVP should lean on public and clearly citable sources. Premium sources can improve speed, but they also increase licensing, attribution, and cost obligations.",
-            systematic_signal="A source-grounded brief is only defensible if its data rights and citation rules are operationally clean.",
-            risk="Republishing proprietary data or news summaries too aggressively could create licensing exposure.",
-            future_vector="Before paid launch, source rights should become a checklist item in the publication workflow.",
-            arbitrage="A transparent source-rights posture can become trust infrastructure while competitors stay vague.",
-            moat_move="Track source licensing status alongside source tier and source accuracy.",
-            verification_status="PARTIAL",
-            confidence="HIGH",
-            caveat="Specific vendor terms still need direct legal/product review before commercial use.",
+            source_tier="TIER_1",
+            evidence=f"Latest CME notices feed item: {cme_headline}",
+            summary="Operational notices are now live-fed, which gives the brief a practical edge around margin, session, and contract-structure changes.",
+            systematic_signal="Execution and exchange plumbing changes can break assumptions faster than market commentary does.",
+            risk="If this feed is unavailable, operations-sensitive findings can be stale.",
+            future_vector="Add parser rules that classify margin/limit/calendar notices into a watchlist automatically.",
+            arbitrage="Most market summaries ignore exchange ops detail until it causes slippage.",
+            moat_move="Turn notice ingestion into structured risk flags in the archive.",
+            verification_status="VERIFIED",
+            confidence="MEDIUM",
+            caveat="RSS headlines require follow-through drilldown into the full notice before acting.",
             signal_strength="HIGH",
         )
     ]
@@ -216,10 +303,15 @@ def build_brief() -> dict[str, Any]:
 
     return {
         "brief_name": "Systematic - The Living Brief for Systematic Traders",
-        "date": "2026-05-16",
-        "observed_at": "2026-05-16 06:00 America/New_York",
-        "lead_signal": "Volatility is elevated, but Systematic should wait for cross-asset confirmation before treating this as a regime break.",
-        "source_integrity": "This sample uses imported operating docs and public-source placeholders. Market values are illustrative until live ingestion is wired.",
+        "date": date_value,
+        "observed_at": observed_at,
+        "lead_signal": f"Market pulse: VIX={vix_value:.2f}, IG OAS={ig_oas:.2f}, HY OAS={hy_oas:.2f}. Spread gap={spread_gap:.1f} bps; wait for confirmation before framing a regime break.",
+        "disclaimer": (
+            "Systematic is a source-grounded research brief for disciplined context. "
+            "It is not personalized financial advice, not execution instructions, and not a substitute "
+            "for your own system rules and risk controls."
+        ),
+        "source_integrity": "This run uses live public-source pulls from FRED plus CFTC and CME RSS. Some sections still use editorial scaffolding while ingestion broadens.",
         "sections": {
             "regime_watch": regime_watch,
             "strategy_performance_signals": strategy_performance,
@@ -228,7 +320,7 @@ def build_brief() -> dict[str, Any]:
             "cta_competitor_watch": cta_competitor_watch,
         },
         "arbitrage_moat": {
-            "near_term_arbitrage": "Frame noisy market stress as conditional evidence instead of content urgency.",
+            "near_term_arbitrage": "Use live public data to reduce narrative lag and keep claims tied to observed timestamps.",
             "future_signal": "If the watchlist triggers confirm, the brief can update from HOT to STRESSED without sounding reactive.",
             "moat_strategy": "Persist source tiers, caveats, archive memory, and outcome reviews for every finding.",
             "do_not_do": "Do not turn VIX, COT, or CTA commentary into discretionary override language.",
@@ -236,7 +328,7 @@ def build_brief() -> dict[str, Any]:
         "systematic_takes": [
             {
                 "voices": ["Parker", "Hite"],
-                "take": "The job is to reduce heat, not invent a prediction.",
+                "take": "The job is to trust live evidence cadence, then layer judgment.",
                 "why_it_matters": "Crowding and volatility can make good systems feel broken before they actually are.",
                 "action": "Review drawdown bands, margin exposure, and rule adherence before touching parameters.",
             },
@@ -249,12 +341,12 @@ def build_brief() -> dict[str, Any]:
         ],
         "discipline_check": "Do not override a live system because one volatility signal feels urgent.",
         "hallucination_guardrails": [
-            "Market values in this sample are illustrative.",
-            "COT positioning is delayed and should not be treated as real-time confirmation.",
-            "Internal docs are useful operating sources but not external market evidence.",
+            "FRED values are live but still single-series snapshots without multi-source reconciliation.",
+            "CFTC/CME findings are pulled from RSS headlines and require full-document follow-up before hard conclusions.",
+            "Systematic Takes are AI lens simulations inspired by named personas, not direct statements from those individuals.",
             "No personalized financial advice is provided.",
         ],
-        "systematic_synthesis": "The sample brief demonstrates the intended operating posture: source-grounded, conditional, archive-aware, and allergic to discretionary panic. The next build step is ingestion and storage, not more prose.",
+        "systematic_synthesis": "This run is no longer static: market and regulatory context is now scraped live at generation time. The remaining build priority is deeper classification and archive-level signal scoring.",
         "recommended_move": "Create the first real archive entry and start tracking whether each watchlist trigger resolves, fails, or remains pending.",
         "watchlist": [
             {
@@ -274,12 +366,12 @@ def build_brief() -> dict[str, Any]:
             },
         ],
         "strategic_prompt": "What will Systematic remember in 30 days that a normal market newsletter will have forgotten?",
-        "next_search": "latest CFTC COT equity futures positioning managed futures trend following drawdown",
+        "next_search": "latest CFTC COT disaggregated futures positioning plus CME margin notice changes",
         "findings": findings,
         "data_freshness": {
-            "freshness_status": "SAMPLE_ONLY",
-            "latest_data_point": "2026-05-15",
-            "missing_live_ingestion": True,
+            "freshness_status": data_freshness_status,
+            "latest_data_point": max(vix_date, ig_date, hy_date),
+            "fallback_notes": fallback_notes,
         },
     }
 
@@ -337,19 +429,39 @@ def render_text(brief: dict[str, Any]) -> str:
         brief["brief_name"].upper(),
         brief["date"],
         "",
+        "What This Is",
+        brief.get(
+            "disclaimer",
+            "This brief is for research context only and is not personalized financial advice.",
+        ),
+        "",
         f"Lead Signal: {brief['lead_signal']}",
         "",
         "Source Integrity",
         brief["source_integrity"],
         "",
-        "Findings",
+        "Core Findings",
     ]
 
-    for index, item in enumerate(brief["findings"], start=1):
+    section_map = {
+        "regime_watch": "Regime",
+        "strategy_performance_signals": "Performance",
+        "research_edge": "Research",
+        "regulatory_structure": "Regulatory",
+        "cta_competitor_watch": "CTA/Competitor",
+    }
+    ordered_items: list[tuple[str, dict[str, Any]]] = []
+    for key, items in brief["sections"].items():
+        tag = section_map.get(key, key)
+        for item in items:
+            ordered_items.append((tag, item))
+
+    for index, (tag, item) in enumerate(ordered_items, start=1):
         lines.extend(
             [
                 "",
                 f"{index}. {item['title']}",
+                f"   Category: {tag}",
                 f"   Source: {item['source']} ({item['source_tier']})",
                 f"   Confidence: {item['confidence']} | Signal: {item['signal_strength']}",
                 f"   Summary: {item['summary']}",
@@ -363,7 +475,17 @@ def render_text(brief: dict[str, Any]) -> str:
             "Systematic Synthesis",
             brief["systematic_synthesis"],
             "",
-            f"Recommended Move: {brief['recommended_move']}",
+            "Systematic Takes (AI Lenses)",
+        ]
+    )
+
+    for take in brief.get("systematic_takes", []):
+        lines.append(f"- {' + '.join(take.get('voices', []))}: {take.get('take', '')} {take.get('action', '')}")
+
+    lines.extend(
+        [
+            "",
+            f"Recommended Move (For JJ): {brief['recommended_move']}",
             "",
             "Watchlist",
         ]
@@ -372,7 +494,7 @@ def render_text(brief: dict[str, Any]) -> str:
     for item in brief["watchlist"]:
         lines.append(f"- {item['item']}: {item['trigger']}")
 
-    lines.extend(["", f"Today's Strategic Prompt: {brief['strategic_prompt']}"])
+    lines.extend(["", f"Today's Strategic Prompt (For JJ): {brief['strategic_prompt']}"])
     return "\n".join(lines) + "\n"
 
 

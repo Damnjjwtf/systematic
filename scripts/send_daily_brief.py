@@ -94,7 +94,18 @@ def section_title(value: str) -> str:
     return value.replace("_", " ").upper()
 
 
-def finding_html(item: dict[str, Any]) -> str:
+def section_tag(value: str) -> str:
+    labels = {
+        "regime_watch": "Regime",
+        "strategy_performance_signals": "Performance",
+        "research_edge": "Research",
+        "regulatory_structure": "Regulatory",
+        "cta_competitor_watch": "CTA/Competitor",
+    }
+    return labels.get(value, value.replace("_", " ").title())
+
+
+def finding_html(item: dict[str, Any], tag: str) -> str:
     source = escape(item["source"])
     title = escape(item["title"])
     summary = escape(item["summary"])
@@ -106,6 +117,7 @@ def finding_html(item: dict[str, Any]) -> str:
 
     return f"""
       <article style="margin:0 0 18px;">
+        <p style="margin:0 0 4px;font-family:'Courier New','SF Mono',Consolas,monospace;font-size:12px;color:#4b5563;">{escape(tag)}</p>
         <p style="margin:0 0 6px;"><strong>{title}</strong></p>
         <p style="margin:0 0 6px;">{summary}</p>
         <p style="margin:0 0 6px;"><strong>Signal:</strong> {signal}</p>
@@ -119,18 +131,12 @@ def finding_html(item: dict[str, Any]) -> str:
 
 def render_html(brief: dict[str, Any]) -> str:
     title = escape(f"{brief['brief_name']} - {brief['date']}")
-    sections: list[str] = []
+    findings_html: list[str] = []
 
     for key, items in brief["sections"].items():
-        if not items:
-            continue
-        body = "\n".join(finding_html(item) for item in items)
-        sections.append(
-            f"""
-      <h2 style="font-size:14px;margin:24px 0 8px;">{section_title(key)}</h2>
-      {body}
-            """
-        )
+        tag = section_tag(key)
+        for item in items:
+            findings_html.append(finding_html(item, tag))
 
     takes = "\n".join(
         f"""
@@ -152,6 +158,13 @@ def render_html(brief: dict[str, Any]) -> str:
     )
     arbitrage = brief["arbitrage_moat"]
 
+    disclaimer = escape(
+        brief.get(
+            "disclaimer",
+            "This brief is for research context only and is not personalized financial advice.",
+        )
+    )
+
     return f"""<!doctype html>
 <html lang="en">
   <head>
@@ -166,13 +179,18 @@ def render_html(brief: dict[str, Any]) -> str:
         {escape(brief['date'])} | Observed {escape(brief['observed_at'])}
       </p>
 
+      <p style="margin:0 0 18px;padding:12px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;font-size:13px;">
+        {disclaimer}
+      </p>
+
       <h2 style="font-size:14px;margin:24px 0 8px;">LEAD SIGNAL</h2>
       <p>{escape(brief['lead_signal'])}</p>
 
       <h2 style="font-size:14px;margin:24px 0 8px;">SOURCE INTEGRITY</h2>
       <p>{escape(brief['source_integrity'])}</p>
 
-      {''.join(sections)}
+      <h2 style="font-size:14px;margin:24px 0 8px;">CORE FINDINGS</h2>
+      {''.join(findings_html)}
 
       <h2 style="font-size:14px;margin:24px 0 8px;">ARBITRAGE + MOAT</h2>
       <p><strong>Near-term arbitrage:</strong> {escape(arbitrage['near_term_arbitrage'])}</p>
@@ -180,7 +198,7 @@ def render_html(brief: dict[str, Any]) -> str:
       <p><strong>Moat strategy:</strong> {escape(arbitrage['moat_strategy'])}</p>
       <p><strong>Do not do:</strong> {escape(arbitrage['do_not_do'])}</p>
 
-      <h2 style="font-size:14px;margin:24px 0 8px;">SYSTEMATIC TAKES</h2>
+      <h2 style="font-size:14px;margin:24px 0 8px;">SYSTEMATIC TAKES (AI LENSES)</h2>
       {takes}
 
       <h2 style="font-size:14px;margin:24px 0 8px;">DISCIPLINE CHECK</h2>
@@ -192,13 +210,13 @@ def render_html(brief: dict[str, Any]) -> str:
       <h2 style="font-size:14px;margin:24px 0 8px;">SYSTEMATIC SYNTHESIS</h2>
       <p>{escape(brief['systematic_synthesis'])}</p>
 
-      <h2 style="font-size:14px;margin:24px 0 8px;">RECOMMENDED MOVE</h2>
+      <h2 style="font-size:14px;margin:24px 0 8px;">RECOMMENDED MOVE (FOR JJ)</h2>
       <p>{escape(brief['recommended_move'])}</p>
 
       <h2 style="font-size:14px;margin:24px 0 8px;">WATCHLIST</h2>
       {watchlist}
 
-      <h2 style="font-size:14px;margin:24px 0 8px;">TODAY'S STRATEGIC PROMPT</h2>
+      <h2 style="font-size:14px;margin:24px 0 8px;">TODAY'S STRATEGIC PROMPT (FOR JJ)</h2>
       <p>{escape(brief['strategic_prompt'])}</p>
 
       <h2 style="font-size:14px;margin:24px 0 8px;">NEXT SEARCH</h2>

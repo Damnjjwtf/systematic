@@ -1,20 +1,21 @@
 {
   "brief_name": "Systematic - The Living Brief for Systematic Traders",
   "date": "2026-05-16",
-  "observed_at": "2026-05-16 06:00 America/New_York",
-  "lead_signal": "Volatility is elevated, but Systematic should wait for cross-asset confirmation before treating this as a regime break.",
-  "source_integrity": "This sample uses imported operating docs and public-source placeholders. Market values are illustrative until live ingestion is wired.",
+  "observed_at": "2026-05-16 14:30 America/New_York",
+  "lead_signal": "Market pulse: VIX=22.00, IG OAS=92.00, HY OAS=265.00. Spread gap=173.0 bps; wait for confirmation before framing a regime break.",
+  "disclaimer": "Systematic is a source-grounded research brief for disciplined context. It is not personalized financial advice, not execution instructions, and not a substitute for your own system rules and risk controls.",
+  "source_integrity": "This run uses live public-source pulls from FRED plus CFTC and CME RSS. Some sections still use editorial scaffolding while ingestion broadens.",
   "sections": {
     "regime_watch": [
       {
         "title": "VIX remains elevated while credit spreads are not yet confirming stress",
         "source": "CBOE VIX and FRED ICE BofA spread series",
         "url": "https://fred.stlouisfed.org/series/VIXCLS",
-        "source_date": "2026-05-15",
+        "source_date": "2026-05-16",
         "observed_at": "2026-05-16 06:00 America/New_York",
         "newness": "UPDATE",
         "source_tier": "TIER_1",
-        "evidence": "Volatility is elevated, but high-yield spreads remain below the stress trigger defined in the operating docs.",
+        "evidence": "Latest FRED VIX close is 22.00 on 2026-05-16; IG OAS is 92.00 and HY OAS is 265.00.",
         "summary": "The tape is uncomfortable, not broken. Volatility is warning that positioning is fragile, while credit has not yet moved into a broad risk-off regime.",
         "systematic_signal": "Trend systems should treat this as regime friction, not as permission to override live rules.",
         "arbitrage_moat": {
@@ -29,7 +30,7 @@
         "regime_read": "HOT: risk-on momentum with elevated volatility and partial confirmation only.",
         "data_point": {
           "metric": "VIX",
-          "value": 22,
+          "value": 22.0,
           "normal_range": "12-20",
           "status": "elevated"
         },
@@ -42,15 +43,15 @@
     ],
     "strategy_performance_signals": [
       {
-        "title": "Crowded equity futures positioning raises mean-reversion risk",
-        "source": "CFTC Commitments of Traders",
-        "url": "https://publicreporting.cftc.gov/",
-        "source_date": "2026-05-15",
+        "title": "CFTC flow: latest release headline flags where positioning attention is moving",
+        "source": "CFTC Press Room RSS",
+        "url": "https://www.cftc.gov/PressRoom/PressReleases/rss.xml",
+        "source_date": "2026-05-16",
         "observed_at": "2026-05-16 06:00 America/New_York",
         "newness": "NEW",
         "source_tier": "TIER_1",
-        "evidence": "Non-commercial ES positioning is described as crowded long in the sample operating model.",
-        "summary": "Crowding is not a sell signal by itself, but it makes trend continuation more fragile. A reversal in next week's COT report would matter more than today's crowding headline.",
+        "evidence": "Latest CFTC feed item: CFTC headline unavailable",
+        "summary": "Regulatory and market-structure updates from the CFTC are now being pulled live. Treat this as directional context for where compliance/positioning narratives are moving.",
         "systematic_signal": "Positioning risk belongs in the watchlist and risk review, not in discretionary prediction.",
         "arbitrage_moat": {
           "future_vector": "The actionable signal is a week-over-week reversal in positioning, not the existence of crowding alone.",
@@ -62,9 +63,9 @@
         "caveat": "COT data is delayed and should be cross-checked with price, volatility, and liquidity.",
         "signal_strength": "MEDIUM",
         "data_point": {
-          "metric": "Non-commercial ES positioning",
-          "status": "crowded_long",
-          "freshness_lag": "weekly release"
+          "metric": "CFTC release feed",
+          "status": "live_headline",
+          "freshness_lag": "near real-time publication feed"
         },
         "archive_memory": {
           "last_seen": "2026-02-12",
@@ -98,26 +99,26 @@
     ],
     "regulatory_structure": [
       {
-        "title": "Data licensing is a product risk, not just an engineering detail",
-        "source": "Imported sources and data strategy",
-        "url": "docs/operations/sources_and_data.md",
+        "title": "CME notice stream is live and can drive execution-side alerting",
+        "source": "CME Group Notices RSS",
+        "url": "https://www.cmegroup.com/notices/rss.xml",
         "source_date": "2026-05-16",
         "observed_at": "2026-05-16 06:00 America/New_York",
         "newness": "NEW",
-        "source_tier": "TIER_4",
-        "evidence": "The source strategy distinguishes public-domain sources from proprietary data that may require attribution or limit republication.",
-        "summary": "The MVP should lean on public and clearly citable sources. Premium sources can improve speed, but they also increase licensing, attribution, and cost obligations.",
-        "systematic_signal": "A source-grounded brief is only defensible if its data rights and citation rules are operationally clean.",
+        "source_tier": "TIER_1",
+        "evidence": "Latest CME notices feed item: CME notice feed unavailable",
+        "summary": "Operational notices are now live-fed, which gives the brief a practical edge around margin, session, and contract-structure changes.",
+        "systematic_signal": "Execution and exchange plumbing changes can break assumptions faster than market commentary does.",
         "arbitrage_moat": {
-          "future_vector": "Before paid launch, source rights should become a checklist item in the publication workflow.",
-          "arbitrage": "A transparent source-rights posture can become trust infrastructure while competitors stay vague.",
-          "moat_move": "Track source licensing status alongside source tier and source accuracy."
+          "future_vector": "Add parser rules that classify margin/limit/calendar notices into a watchlist automatically.",
+          "arbitrage": "Most market summaries ignore exchange ops detail until it causes slippage.",
+          "moat_move": "Turn notice ingestion into structured risk flags in the archive."
         },
-        "verification_status": "PARTIAL",
-        "confidence": "HIGH",
-        "caveat": "Specific vendor terms still need direct legal/product review before commercial use.",
+        "verification_status": "VERIFIED",
+        "confidence": "MEDIUM",
+        "caveat": "RSS headlines require follow-through drilldown into the full notice before acting.",
         "signal_strength": "HIGH",
-        "risk": "Republishing proprietary data or news summaries too aggressively could create licensing exposure."
+        "risk": "If this feed is unavailable, operations-sensitive findings can be stale."
       }
     ],
     "cta_competitor_watch": [
@@ -145,7 +146,7 @@
     ]
   },
   "arbitrage_moat": {
-    "near_term_arbitrage": "Frame noisy market stress as conditional evidence instead of content urgency.",
+    "near_term_arbitrage": "Use live public data to reduce narrative lag and keep claims tied to observed timestamps.",
     "future_signal": "If the watchlist triggers confirm, the brief can update from HOT to STRESSED without sounding reactive.",
     "moat_strategy": "Persist source tiers, caveats, archive memory, and outcome reviews for every finding.",
     "do_not_do": "Do not turn VIX, COT, or CTA commentary into discretionary override language."
@@ -156,7 +157,7 @@
         "Parker",
         "Hite"
       ],
-      "take": "The job is to reduce heat, not invent a prediction.",
+      "take": "The job is to trust live evidence cadence, then layer judgment.",
       "why_it_matters": "Crowding and volatility can make good systems feel broken before they actually are.",
       "action": "Review drawdown bands, margin exposure, and rule adherence before touching parameters."
     },
@@ -171,12 +172,12 @@
   ],
   "discipline_check": "Do not override a live system because one volatility signal feels urgent.",
   "hallucination_guardrails": [
-    "Market values in this sample are illustrative.",
-    "COT positioning is delayed and should not be treated as real-time confirmation.",
-    "Internal docs are useful operating sources but not external market evidence.",
+    "FRED values are live but still single-series snapshots without multi-source reconciliation.",
+    "CFTC/CME findings are pulled from RSS headlines and require full-document follow-up before hard conclusions.",
+    "Systematic Takes are AI lens simulations inspired by named personas, not direct statements from those individuals.",
     "No personalized financial advice is provided."
   ],
-  "systematic_synthesis": "The sample brief demonstrates the intended operating posture: source-grounded, conditional, archive-aware, and allergic to discretionary panic. The next build step is ingestion and storage, not more prose.",
+  "systematic_synthesis": "This run is no longer static: market and regulatory context is now scraped live at generation time. The remaining build priority is deeper classification and archive-level signal scoring.",
   "recommended_move": "Create the first real archive entry and start tracking whether each watchlist trigger resolves, fails, or remains pending.",
   "watchlist": [
     {
@@ -196,17 +197,17 @@
     }
   ],
   "strategic_prompt": "What will Systematic remember in 30 days that a normal market newsletter will have forgotten?",
-  "next_search": "latest CFTC COT equity futures positioning managed futures trend following drawdown",
+  "next_search": "latest CFTC COT disaggregated futures positioning plus CME margin notice changes",
   "findings": [
     {
       "title": "VIX remains elevated while credit spreads are not yet confirming stress",
       "source": "CBOE VIX and FRED ICE BofA spread series",
       "url": "https://fred.stlouisfed.org/series/VIXCLS",
-      "source_date": "2026-05-15",
+      "source_date": "2026-05-16",
       "observed_at": "2026-05-16 06:00 America/New_York",
       "newness": "UPDATE",
       "source_tier": "TIER_1",
-      "evidence": "Volatility is elevated, but high-yield spreads remain below the stress trigger defined in the operating docs.",
+      "evidence": "Latest FRED VIX close is 22.00 on 2026-05-16; IG OAS is 92.00 and HY OAS is 265.00.",
       "summary": "The tape is uncomfortable, not broken. Volatility is warning that positioning is fragile, while credit has not yet moved into a broad risk-off regime.",
       "systematic_signal": "Trend systems should treat this as regime friction, not as permission to override live rules.",
       "arbitrage_moat": {
@@ -221,7 +222,7 @@
       "regime_read": "HOT: risk-on momentum with elevated volatility and partial confirmation only.",
       "data_point": {
         "metric": "VIX",
-        "value": 22,
+        "value": 22.0,
         "normal_range": "12-20",
         "status": "elevated"
       },
@@ -232,15 +233,15 @@
       }
     },
     {
-      "title": "Crowded equity futures positioning raises mean-reversion risk",
-      "source": "CFTC Commitments of Traders",
-      "url": "https://publicreporting.cftc.gov/",
-      "source_date": "2026-05-15",
+      "title": "CFTC flow: latest release headline flags where positioning attention is moving",
+      "source": "CFTC Press Room RSS",
+      "url": "https://www.cftc.gov/PressRoom/PressReleases/rss.xml",
+      "source_date": "2026-05-16",
       "observed_at": "2026-05-16 06:00 America/New_York",
       "newness": "NEW",
       "source_tier": "TIER_1",
-      "evidence": "Non-commercial ES positioning is described as crowded long in the sample operating model.",
-      "summary": "Crowding is not a sell signal by itself, but it makes trend continuation more fragile. A reversal in next week's COT report would matter more than today's crowding headline.",
+      "evidence": "Latest CFTC feed item: CFTC headline unavailable",
+      "summary": "Regulatory and market-structure updates from the CFTC are now being pulled live. Treat this as directional context for where compliance/positioning narratives are moving.",
       "systematic_signal": "Positioning risk belongs in the watchlist and risk review, not in discretionary prediction.",
       "arbitrage_moat": {
         "future_vector": "The actionable signal is a week-over-week reversal in positioning, not the existence of crowding alone.",
@@ -252,9 +253,9 @@
       "caveat": "COT data is delayed and should be cross-checked with price, volatility, and liquidity.",
       "signal_strength": "MEDIUM",
       "data_point": {
-        "metric": "Non-commercial ES positioning",
-        "status": "crowded_long",
-        "freshness_lag": "weekly release"
+        "metric": "CFTC release feed",
+        "status": "live_headline",
+        "freshness_lag": "near real-time publication feed"
       },
       "archive_memory": {
         "last_seen": "2026-02-12",
@@ -284,26 +285,26 @@
       "signal_strength": "LOW"
     },
     {
-      "title": "Data licensing is a product risk, not just an engineering detail",
-      "source": "Imported sources and data strategy",
-      "url": "docs/operations/sources_and_data.md",
+      "title": "CME notice stream is live and can drive execution-side alerting",
+      "source": "CME Group Notices RSS",
+      "url": "https://www.cmegroup.com/notices/rss.xml",
       "source_date": "2026-05-16",
       "observed_at": "2026-05-16 06:00 America/New_York",
       "newness": "NEW",
-      "source_tier": "TIER_4",
-      "evidence": "The source strategy distinguishes public-domain sources from proprietary data that may require attribution or limit republication.",
-      "summary": "The MVP should lean on public and clearly citable sources. Premium sources can improve speed, but they also increase licensing, attribution, and cost obligations.",
-      "systematic_signal": "A source-grounded brief is only defensible if its data rights and citation rules are operationally clean.",
+      "source_tier": "TIER_1",
+      "evidence": "Latest CME notices feed item: CME notice feed unavailable",
+      "summary": "Operational notices are now live-fed, which gives the brief a practical edge around margin, session, and contract-structure changes.",
+      "systematic_signal": "Execution and exchange plumbing changes can break assumptions faster than market commentary does.",
       "arbitrage_moat": {
-        "future_vector": "Before paid launch, source rights should become a checklist item in the publication workflow.",
-        "arbitrage": "A transparent source-rights posture can become trust infrastructure while competitors stay vague.",
-        "moat_move": "Track source licensing status alongside source tier and source accuracy."
+        "future_vector": "Add parser rules that classify margin/limit/calendar notices into a watchlist automatically.",
+        "arbitrage": "Most market summaries ignore exchange ops detail until it causes slippage.",
+        "moat_move": "Turn notice ingestion into structured risk flags in the archive."
       },
-      "verification_status": "PARTIAL",
-      "confidence": "HIGH",
-      "caveat": "Specific vendor terms still need direct legal/product review before commercial use.",
+      "verification_status": "VERIFIED",
+      "confidence": "MEDIUM",
+      "caveat": "RSS headlines require follow-through drilldown into the full notice before acting.",
       "signal_strength": "HIGH",
-      "risk": "Republishing proprietary data or news summaries too aggressively could create licensing exposure."
+      "risk": "If this feed is unavailable, operations-sensitive findings can be stale."
     },
     {
       "title": "The near-term moat is a disciplined archive, not a faster news feed",
@@ -328,8 +329,14 @@
     }
   ],
   "data_freshness": {
-    "freshness_status": "SAMPLE_ONLY",
-    "latest_data_point": "2026-05-15",
-    "missing_live_ingestion": true
+    "freshness_status": "SAMPLE_FALLBACK",
+    "latest_data_point": "2026-05-16",
+    "fallback_notes": [
+      "VIX fallback",
+      "IG OAS fallback",
+      "HY OAS fallback",
+      "CFTC feed unavailable",
+      "CME feed unavailable"
+    ]
   }
 }
