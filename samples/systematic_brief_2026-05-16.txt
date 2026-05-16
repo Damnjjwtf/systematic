@@ -1,0 +1,51 @@
+SYSTEMATIC - THE LIVING BRIEF FOR SYSTEMATIC TRADERS
+2026-05-16
+
+Lead Signal: Volatility is elevated, but Systematic should wait for cross-asset confirmation before treating this as a regime break.
+
+Source Integrity
+This sample uses imported operating docs and public-source placeholders. Market values are illustrative until live ingestion is wired.
+
+Findings
+
+1. VIX remains elevated while credit spreads are not yet confirming stress
+   Source: CBOE VIX and FRED ICE BofA spread series (TIER_1)
+   Confidence: MEDIUM | Signal: MEDIUM
+   Summary: The tape is uncomfortable, not broken. Volatility is warning that positioning is fragile, while credit has not yet moved into a broad risk-off regime.
+   Caveat: VIX can spike around event risk and options positioning without becoming a durable trend regime change.
+
+2. Crowded equity futures positioning raises mean-reversion risk
+   Source: CFTC Commitments of Traders (TIER_1)
+   Confidence: MEDIUM | Signal: MEDIUM
+   Summary: Crowding is not a sell signal by itself, but it makes trend continuation more fragile. A reversal in next week's COT report would matter more than today's crowding headline.
+   Caveat: COT data is delayed and should be cross-checked with price, volatility, and liquidity.
+
+3. The useful research question is robustness, not fresh alpha
+   Source: Systematic operating spec (TIER_4)
+   Confidence: MEDIUM | Signal: LOW
+   Summary: The brief should not chase every new backtest. It should filter research through whether it changes robustness, execution, sizing, or regime classification.
+   Caveat: This is an internal operating principle, not an external market observation.
+
+4. Data licensing is a product risk, not just an engineering detail
+   Source: Imported sources and data strategy (TIER_4)
+   Confidence: HIGH | Signal: HIGH
+   Summary: The MVP should lean on public and clearly citable sources. Premium sources can improve speed, but they also increase licensing, attribution, and cost obligations.
+   Caveat: Specific vendor terms still need direct legal/product review before commercial use.
+
+5. The near-term moat is a disciplined archive, not a faster news feed
+   Source: Living Briefs north star and GStack review (TIER_4)
+   Confidence: HIGH | Signal: HIGH
+   Summary: Systematic should not compete with Bloomberg or Reuters on speed. It should compound memory around source reliability, repeated regimes, caveats, and decisions avoided.
+   Caveat: The moat only compounds if the brief is published consistently and outcomes are reviewed.
+
+Systematic Synthesis
+The sample brief demonstrates the intended operating posture: source-grounded, conditional, archive-aware, and allergic to discretionary panic. The next build step is ingestion and storage, not more prose.
+
+Recommended Move: Create the first real archive entry and start tracking whether each watchlist trigger resolves, fails, or remains pending.
+
+Watchlist
+- High-yield spread confirmation: HY OAS widens through the configured stress threshold or rises sharply over five sessions.
+- COT reversal from crowded long positioning: Next weekly COT report shows a material non-commercial reduction.
+- Source rights and licensing: Any paid vendor data is used in subscriber-facing output.
+
+Today's Strategic Prompt: What will Systematic remember in 30 days that a normal market newsletter will have forgotten?

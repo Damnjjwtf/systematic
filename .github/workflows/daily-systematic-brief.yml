@@ -1,0 +1,40 @@
+name: Daily Systematic Brief
+
+on:
+  schedule:
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Render/archive without sending"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+jobs:
+  send-brief:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Render and send daily brief
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          SYSTEMATIC_BRIEF_TO: ${{ secrets.SYSTEMATIC_BRIEF_TO }}
+          SYSTEMATIC_BRIEF_FROM_NAME: Systematic - The Living Brief for Systematic Traders
+          SYSTEMATIC_BRIEF_EMAIL_PROVIDER: resend
+          SYSTEMATIC_BRIEF_DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: python3 scripts/send_daily_brief.py --send
